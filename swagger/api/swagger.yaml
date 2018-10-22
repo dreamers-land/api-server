@@ -1,0 +1,642 @@
+---
+swagger: "2.0"
+info:
+  description: "This is a sample server Dreamland server.  You can find out more about\
+    \     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net,\
+    \ #swagger](http://swagger.io/irc/).      For this sample, you can use the api\
+    \ key `special-key` to test the authorization     filters."
+  version: "1.0.0"
+  title: "Dreamers Land"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "virtserver.swaggerhub.com"
+basePath: "/BlueT/dreamersland/1.0.0"
+tags:
+- name: "dream"
+  description: "Everything about your Dreams"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+- name: "user"
+  description: "Operations about user"
+  externalDocs:
+    description: "Find out more about our land"
+    url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
+paths:
+  /dream:
+    post:
+      tags:
+      - "dream"
+      summary: "Add a new dream to the land"
+      description: ""
+      operationId: "addDream"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Dream object that needs to be added to the land"
+        required: true
+        schema:
+          $ref: "#/definitions/Dream"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - dreamersland_auth:
+        - "write:dreams"
+        - "read:dreams"
+      x-swagger-router-controller: "Dream"
+    put:
+      tags:
+      - "dream"
+      summary: "Update an existing dream"
+      description: ""
+      operationId: "updateDream"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Dream object that needs to be added to the land"
+        required: true
+        schema:
+          $ref: "#/definitions/Dream"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Dream not found"
+        405:
+          description: "Validation exception"
+      security:
+      - dreamersland_auth:
+        - "write:dreams"
+        - "read:dreams"
+      deprecated: true
+      x-swagger-router-controller: "Dream"
+  /dream/findByStatus:
+    get:
+      tags:
+      - "dream"
+      summary: "Finds Dreams by status"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "findDreamsByStatus"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "status"
+        in: "query"
+        description: "Status values that need to be considered for filter"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          default: "available"
+          enum:
+          - "available"
+          - "pending"
+          - "sold"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Dream"
+        400:
+          description: "Invalid status value"
+      security:
+      - dreamersland_auth:
+        - "write:dreams"
+        - "read:dreams"
+      deprecated: true
+      x-swagger-router-controller: "Dream"
+  /dream/findByTags:
+    get:
+      tags:
+      - "dream"
+      summary: "Finds Dreams by tags"
+      description: "Muliple tags can be provided with comma separated strings. Use\
+        \         tag1, tag2, tag3 for testing."
+      operationId: "findDreamsByTags"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tags"
+        in: "query"
+        description: "Tags to filter by"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Dream"
+        400:
+          description: "Invalid tag value"
+      security:
+      - dreamersland_auth:
+        - "write:dreams"
+        - "read:dreams"
+      deprecated: true
+      x-swagger-router-controller: "Dream"
+  /dream/{dreamId}:
+    get:
+      tags:
+      - "dream"
+      summary: "Find dream by ID"
+      description: "Returns a single dream"
+      operationId: "getDreamById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "dreamId"
+        in: "path"
+        description: "ID of dream to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Dream"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Dream not found"
+      security:
+      - api_key: []
+      x-swagger-router-controller: "Dream"
+    delete:
+      tags:
+      - "dream"
+      summary: "Deletes a dream"
+      description: ""
+      operationId: "deleteDream"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "api_key"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "dreamId"
+        in: "path"
+        description: "Dream id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Dream not found"
+      security:
+      - dreamersland_auth:
+        - "write:dreams"
+        - "read:dreams"
+      x-swagger-router-controller: "Dream"
+    patch:
+      tags:
+      - "dream"
+      summary: "Updates a dream in the land with form data"
+      description: ""
+      operationId: "updateDreamWithForm"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "dreamId"
+        in: "path"
+        description: "ID of dream that needs to be updated"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "name"
+        in: "formData"
+        description: "Updated name of the dream"
+        required: false
+        type: "string"
+      - name: "status"
+        in: "formData"
+        description: "Updated status of the dream"
+        required: false
+        type: "string"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - dreamersland_auth:
+        - "write:dreams"
+        - "read:dreams"
+      x-swagger-router-controller: "Dream"
+  /dream/{dreamId}/comment:
+    post:
+      tags:
+      - "dream"
+      summary: "add new comment"
+      description: ""
+      operationId: "addComment"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "dreamId"
+        in: "path"
+        description: "ID of dream to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        description: "Dream object that needs to be added to the land"
+        required: true
+        schema:
+          $ref: "#/definitions/Comment"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      security:
+      - dreamersland_auth:
+        - "write:dreams"
+        - "read:dreams"
+      x-swagger-router-controller: "Dream"
+  /user:
+    post:
+      tags:
+      - "user"
+      summary: "Create user"
+      description: "This can only be done by the logged in user."
+      operationId: "createUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+      deprecated: true
+      x-swagger-router-controller: "User"
+  /user/createWithArray:
+    post:
+      tags:
+      - "user"
+      summary: "Creates list of users with given input array"
+      description: ""
+      operationId: "createUsersWithArrayInput"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "List of user object"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+      deprecated: true
+      x-swagger-router-controller: "User"
+  /user/createWithList:
+    post:
+      tags:
+      - "user"
+      summary: "Creates list of users with given input array"
+      description: ""
+      operationId: "createUsersWithListInput"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "List of user object"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+      deprecated: true
+      x-swagger-router-controller: "User"
+  /user/login:
+    get:
+      tags:
+      - "user"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "loginUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          headers:
+            X-Rate-Limit:
+              type: "integer"
+              format: "int32"
+              description: "calls per hour allowed by the user"
+            X-Expires-After:
+              type: "string"
+              format: "date-time"
+              description: "date in UTC when token expires"
+          schema:
+            type: "string"
+        400:
+          description: "Invalid username/password supplied"
+      deprecated: true
+      x-swagger-router-controller: "User"
+  /user/logout:
+    get:
+      tags:
+      - "user"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logoutUser"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+      deprecated: true
+      x-swagger-router-controller: "User"
+  /user/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "Get user by user name"
+      description: ""
+      operationId: "getUserByName"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "Invalid username supplied"
+        404:
+          description: "User not found"
+      deprecated: true
+      x-swagger-router-controller: "User"
+    put:
+      tags:
+      - "user"
+      summary: "Updated user"
+      description: "This can only be done by the logged in user."
+      operationId: "updateUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+      deprecated: true
+      x-swagger-router-controller: "User"
+    delete:
+      tags:
+      - "user"
+      summary: "Delete user"
+      description: "This can only be done by the logged in user."
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be deleted"
+        required: true
+        type: "string"
+      responses:
+        400:
+          description: "Invalid username supplied"
+        404:
+          description: "User not found"
+      deprecated: true
+      x-swagger-router-controller: "User"
+securityDefinitions:
+  dreamersland_auth:
+    type: "oauth2"
+    authorizationUrl: "http://dreamersland.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:dreams: "modify dreams in your account"
+      read:dreams: "read your dreams"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      username:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+    xml:
+      name: "User"
+    example:
+      password: "password"
+      id: 0
+      email: "email"
+      username: "username"
+  Tag:
+    type: "string"
+    xml:
+      name: "Tag"
+  Dream:
+    type: "object"
+    required:
+    - "desc"
+    - "tag"
+    - "timestamp"
+    - "title"
+    - "user"
+    properties:
+      timestamp:
+        type: "number"
+        example: 12345678.901000000536441802978515625
+      title:
+        type: "string"
+        example: "Nintendo Switch for Monospacers"
+      user:
+        $ref: "#/definitions/User"
+      tag:
+        type: "array"
+        items:
+          $ref: "#/definitions/Tag"
+      desc:
+        type: "string"
+        example: "I have a dream"
+      status:
+        type: "string"
+        description: "dream status in the land"
+        enum:
+        - "open"
+        - "working"
+        - "came true"
+      joined:
+        type: "array"
+        items:
+          $ref: "#/definitions/User"
+      like:
+        type: "integer"
+        format: "int32"
+      comment:
+        type: "array"
+        xml:
+          name: "comment"
+          wrapped: true
+        items:
+          $ref: "#/definitions/Comment"
+    xml:
+      name: "Dream"
+    example:
+      like: 6
+      joined:
+      - password: "password"
+        id: 0
+        email: "email"
+        username: "username"
+      - password: "password"
+        id: 0
+        email: "email"
+        username: "username"
+      comment:
+      - user:
+          password: "password"
+          id: 0
+          email: "email"
+          username: "username"
+        timestamp: 12345678.901000000536441802978515625
+        desc: "I have a dream"
+      - user:
+          password: "password"
+          id: 0
+          email: "email"
+          username: "username"
+        timestamp: 12345678.901000000536441802978515625
+        desc: "I have a dream"
+      tag:
+      - {}
+      - {}
+      title: "Nintendo Switch for Monospacers"
+      user:
+        password: "password"
+        id: 0
+        email: "email"
+        username: "username"
+      timestamp: 12345678.901000000536441802978515625
+      desc: "I have a dream"
+      status: "open"
+  Comment:
+    type: "object"
+    required:
+    - "desc"
+    - "timestamp"
+    properties:
+      timestamp:
+        type: "number"
+        example: 12345678.901000000536441802978515625
+      user:
+        $ref: "#/definitions/User"
+      desc:
+        type: "string"
+        example: "I have a dream"
+    xml:
+      name: "Comment"
+    example:
+      user:
+        password: "password"
+        id: 0
+        email: "email"
+        username: "username"
+      timestamp: 12345678.901000000536441802978515625
+      desc: "I have a dream"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+    example:
+      code: 0
+      type: "type"
+      message: "message"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
